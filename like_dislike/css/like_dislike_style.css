@@ -1,0 +1,17 @@
+.btn_container {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 20fr 1fr 1fr;
+}
+
+.like_btn {
+    width: 1em;
+    justify-self: right;
+    grid-column: 2;
+}
+
+.dislike_btn {
+    width: 1em;
+    justify-self: right;
+    grid-column: 3;
+}
