@@ -1,12 +1,12 @@
 let reviews
 
 jQuery(document).ready(function() {
-    console.log("like_dislike_script loaded");
+    console.log("like_dislike_reviews_script loaded");
 
     reviews = document.querySelectorAll('.entry-content');
 
     for (var review = 0; review < reviews.length; review++){
-        var btnHTML = jQuery(`<div class='btn_container' id='btn_container${review}'><div class='like_btn' id='like_btn${review}'><img id='empty_like${review}' src='wp-content/plugins/like_dislike/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${review}'><img id='empty_dislike${review}' src='wp-content/plugins/like_dislike/images/empty_thumb_down.png'></div></div>`);
+        var btnHTML = jQuery(`<div class='btn_container' id='btn_container${review}'><div class='like_btn' id='like_btn${review}'><img id='empty_like${review}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${review}'><img id='empty_dislike${review}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_down.png'></div></div>`);
         reviews[review].append(btnHTML[0]);
         reviews[review].setAttribute('id', `entry_${review}`);
         console.log(`added btns to review no. ${review}`);
@@ -21,7 +21,7 @@ jQuery(document).ready(function() {
 );
 
 // user_id will come from Drew's SQL table
-const user_id = 3;
+const user_id = 4;
 // review_id MAY also come from Drew's SQL table
 
 function incrementLiked (e) {
@@ -38,8 +38,8 @@ function incrementLiked (e) {
     var disliked = 0;
 
     //ensure that a user can't like and dislike the same review
-    jQuery( '#dislike_btn' ).off( 'click', incrementDisliked);
-    var uploadUrl = 'wp-content/plugins/like_dislike/upload_likes.php';
+    jQuery( `#dislike_btn${review_id}` ).off( 'click', incrementDisliked);
+    var uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
     var data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
     //callback to add a like to db
@@ -49,7 +49,7 @@ function incrementLiked (e) {
         console.log(uploadResponse);
 
         //callback to load total number of likes & dislikes from db
-        var queryUrl = 'wp-content/plugins/like_dislike/query_likes.php';
+        var queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
 
         //POST data to query_likes.php so that review_id is accessible
         jQuery.post(queryUrl, data, function(response){
@@ -80,9 +80,9 @@ function incrementDisliked (e) {
     console.log(`liked: ${liked}, disliked: ${disliked}, review_id: ${review_id}`)
 
     // make sure a user can't also click like without reloading the page
-    jQuery( '#like_btn' ).off( 'click', incrementLiked)
+    jQuery( `#like_btn${review_id}` ).off( 'click', incrementLiked)
 
-    var uploadUrl = 'wp-content/plugins/like_dislike/upload_likes.php';
+    var uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
     var data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
     jQuery.post(uploadUrl, data, function(uploadResponse) {
@@ -91,7 +91,7 @@ function incrementDisliked (e) {
         console.log(uploadResponse);
 
         //callback to load total number of likes & dislikes from db
-        var queryUrl = 'wp-content/plugins/like_dislike/query_likes.php';
+        var queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
 
         //POST data to query_likes.php so that review_id is accessible
         jQuery.post(queryUrl, data, function(response){

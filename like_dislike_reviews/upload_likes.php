@@ -17,15 +17,12 @@ function upload_likes() {
     $rows = $wpdb->get_results($sql);
 
     $new_row = array('user_id' => $user_id, 'review_id' => $review_id, 'liked' => $liked, 'disliked' => $disliked);
-    $fake_row = array('user_id' => 99, 'review_id' => 99, 'liked' => 99, 'disliked' => 99);
     
-    $like_data = array("<img src='wp-content/plugins/like_dislike/images/filled_thumb_up.png'>", "<div id='like_count$review_id' style='font-size: .5em; text-align: center;'></div>");
-    $dislike_data = array("<img src='wp-content/plugins/like_dislike/images/filled_thumb_down.png'>", "<div id='dislike_count$review_id' style='font-size: .5em; text-align: center;'></div>");
+    $like_data = array("<img src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_up.png'>", "<div id='like_count$review_id' style='font-size: .5em; text-align: center;'></div>");
+    $dislike_data = array("<img src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_down.png'>", "<div id='dislike_count$review_id' style='font-size: .5em; text-align: center;'></div>");
 
-    if(count($rows) == 0 ) {g
+    if(count($rows) == 0 ) {
         $wpdb->insert($table_name, $new_row);
-    } else {
-        $wpdb->insert($table_name, $fake_row);
     }
 
     if($liked == 1){
@@ -36,10 +33,9 @@ function upload_likes() {
         foreach($dislike_data as $data){
             echo $data;
         };
+
     }
-
     return $review_id;
-
 }
 
 upload_likes();
