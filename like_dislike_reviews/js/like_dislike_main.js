@@ -1,37 +1,24 @@
 let reviews
 
-// .entry-content (SAM) --> .review-list (PRUVE)
-let reviews_class = document.querySelectorAll('.entry-content');
-
-let headers_class = document.querySelectorAll('.entry-title')
+// user_id will come from WP current_user object / auth 
+const user_id = 6;
 
 // submissions = result of query, list of objects
-let submissionsOnPage = [];
+// let submissionsOnPage = [];
 
 jQuery(document).ready(function() {
     console.log("like_dislike_reviews_script loaded");
-
-    // .entry-content (SAM) --> .review-description (PRUVE)
-   
-    //query
-    let submissionURL = "/wp-content/plugins/like_dislike_reviews/query_submissions.php"
+    
+    // .entry-content (SAM) --> .review-list (PRUVE)
+    let reviewsClass = document.querySelectorAll('.entry-content');
     
     // callback function within handleData -- adds buttons to the correct reviews
-    function addButtons(listToCheck) {
-        const item = listToCheck[0]
+    function addButtons() {
 
-        for (let i = 0; i < reviews_class.length; i++){
+        for (let i = 0; i < reviewsClass.length; i++){
         
-            let review = reviews_class[i];
+            let review = reviewsClass[i];
             console.log(review)
-
-            console.log(review.classList)
-
-            review.classList.add(`review-${i}`)
-    
-            // for testing -- title = citation
-            let reviewCitation = headers_class[i].textContent.trim();
-            // console.log(reviewCitation)
 
             let btnHTML = jQuery(`<div class='btn_container' id='btn_container${i}'><div class='like_btn' id='like_btn${i}'><img id='empty_like${i}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${i}'><img id='empty_dislike${i}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_down.png'></div></div>`);
 
@@ -43,89 +30,91 @@ jQuery(document).ready(function() {
             jQuery(`#btn_container${i}`).find('.dislike_btn').one('click', incrementDisliked);
         }     
     }
-
-    const handleData = function (data) {
-        
-        const submissionsObj = JSON.parse(data)
-        for (let submission = 0; submission < submissionsObj.length; submission++) {
-        // console.log(submissionsObj[submission])
-            
-        let newObj
-        let description = submissionsObj[submission]['description'];
-        let citation = submissionsObj[submission]['citations'];
-            
-        //if description == element description, if href of a tag == citation
-        if (description == 'this is the best treatment evur' && citation == 'Review'){
-                newObj = submissionsObj[submission]
-                submissionsOnPage.push(newObj)
-                console.log("FOUND IT")
-            } 
-
-            if (submissionsOnPage.length > 0) {
-                console.log(`XX ${submissionsOnPage}`)
-            }
-        }
-
-        addButtons(submissionsOnPage)
-           
-        }
-
-        
-
-    const submissions = function() {
-        return jQuery.ajax({
-            url: submissionURL
-        })
-        
-    }
     
-    submissions().then(handleData)
+    addButtons()
 
-    })
-        
-    
-
-// user_id will come from Drew's SQL table
-const user_id = 5;
-// review_id MAY also come from Drew's SQL table
+})
 
 
 function incrementLiked (e) {
-    // get the ID tag of the review 
-    var review_id_tag = new String(jQuery(e.target).parent().prop("class"));
 
-    // get the number of the review and add it to a new variable called review_id for use in POST
-    var review_id = review_id_tag[review_id_tag.length - 1];
+// uncomment below block comment to find review IDs from description class
 
-    console.log(review_id);
+/*
+let reviews = document.querySelector('.review-list')
 
-    // values to pass to POST request -- in SQL table, 1 = true, 0 = false
-    var liked = 1;
-    var disliked = 0;
+let review = jQuery(reviews.children[0])
+
+const btns = jQuery("<div>BOOTONS</div>")
+
+let reviewChildren = review.children()
+
+reviewChildren[1].append(btns[0])
+
+let reviewGrandChildren = reviewChildren.children()
+
+for (let el of reviewGrandChildren) {
+    console.log(el.classList);
+    if (el.classList.contains('review-description')) {
+        
+        let reviewIdClass = el.classList[1]
+        let reviewId 
+        let dashIndex
+        
+        for (let char of reviewIdClass) {
+            if (char == "-") {
+                console.log('FOUND THE DASH')
+                console.log(reviewIdClass.indexOf(char))
+                dashIndex = reviewIdClass.indexOf(char)
+                break
+            }
+        }
+        
+        reviewId = reviewIdClass.slice(dashIndex + 1, reviewIdClass.length)
+        console.log(reviewId)
+        break;
+    }
+}
+*/
+
+    // delete this after uncommenting above commented block
+    let review_id_tag = new String(jQuery(e.target).parent().prop("id"));
+
+    // uncomment large block above and assign review_id to reviewId
+    let review_id = review_id_tag[review_id_tag.length - 1];
+
+    // 1 == TRUE, 0 == FALSE
+    let liked = 1;
+    let disliked = 0;
 
     //ensure that a user can only click like/dislike once for each review without refreshing
     jQuery( `#dislike_btn${review_id}` ).off( 'click', incrementDisliked);
-    var uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
-    var data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
+    let uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
+    let data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
+    // temporary HTML to add a button and a temporary number to screen before calling to server
+    let tempHTML = `<img id='temp_like_btn${review_id}' src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_up.png'> <div id='temp_like_count${review_id}' style='font-size: .5em; text-align: center;'>0</div>`
+
+    jQuery(`#empty_like${review_id}`).remove();
+    jQuery(`#like_btn${review_id}`).append(tempHTML)
+    
     //callback to add a like to db
     jQuery.post(uploadUrl, data, function(uploadResponse) {
-        jQuery(`#empty_like${review_id}`).remove();
+        jQuery(`#temp_like_count${review_id}`).remove();
+        jQuery(`#temp_like_btn${review_id}`).remove();
         jQuery(`#like_btn${review_id}`).append(uploadResponse)
-        console.log(uploadResponse);
-
+        
         //callback to load total number of likes & dislikes from db
-        var queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
+        let queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
 
         //POST data to query_likes.php so that review_id is accessible
         jQuery.post(queryUrl, data, function(response){
-            var responseList = JSON.parse(response);
-            var sumLikes = responseList.likes;
-            var sumDislikes = responseList.dislikes;
-            var rev_id = responseList.review_id;
+            let responseList = JSON.parse(response);
+            let sumLikes = responseList.likes;
+            let sumDislikes = responseList.dislikes;
+            let rev_id = responseList.review_id;
             jQuery(`#like_count${review_id}`).append(sumLikes);
             jQuery(`#dislike_btn${review_id}`).append(`<div id='dislike_count' style='font-size: .5em; text-align: center;'>${sumDislikes}</div>`)
-            console.log(responseList);
         })
 
     })    
@@ -133,45 +122,81 @@ function incrementLiked (e) {
 
 function incrementDisliked (e) {
 
-    // get the ID tag of the review 
-    var review_id_tag = new String(jQuery(e.target).parent().prop("id"));
+// uncomment below block comment to find review IDs from description class
 
-    // get the number of the review_id for use in POST methods 
-    var review_id = review_id_tag[review_id_tag.length - 1];
+    /*
+
+    let review = jQuery(btns.parent())
+
+    let reviewChildren = review.children()
+
+    for (let el of reviewChildren) {
+        console.log(el)
+        // console.log(el.classList);
+        if (el.classList.contains('review-description')) {
+            
+            let reviewIdClass = el.classList[1]
+            let reviewId 
+            let dashIndex
+            
+            for (let char of reviewIdClass) {
+                if (char == "-") {
+                    console.log('FOUND THE DASH')
+                    console.log(reviewIdClass.indexOf(char))
+                    dashIndex = reviewIdClass.indexOf(char)
+                    break
+                }
+            }
+            
+            reviewId = reviewIdClass.slice(dashIndex + 1, reviewIdClass.length)
+            console.log(reviewId)
+            break;
+    }
+}
+*/
+
+    // delete this line after uncommenting above commented block
+    let review_id_tag = new String(jQuery(e.target).parent().prop("id"));
+
+    // uncomment large block above and assign review_id to reviewId
+    let review_id = review_id_tag[review_id_tag.length - 1];
 
     // 1 == TRUE, 0 == FALSE
-    var liked = 0;
-    var disliked = 1;
+    let liked = 0;
+    let disliked = 1;
     
     console.log(`liked: ${liked}, disliked: ${disliked}, review_id: ${review_id}`)
 
     // make sure a user can't also click like without reloading the page
     jQuery( `#like_btn${review_id}` ).off( 'click', incrementLiked)
 
-    var uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
-    var data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
+    let uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
+    let data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
     // add an icon to show that the user clicked
+    let tempHTML = `<img id='temp_dislike_btn${review_id}' src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_down.png'> <div id='temp_dislike_count${review_id}' style='font-size: .5em; text-align: center;'>0</div>`
+
+    jQuery(`#empty_dislike${review_id}`).remove();
+    jQuery(`#dislike_btn${review_id}`).append(tempHTML)
 
     jQuery.post(uploadUrl, data, function(uploadResponse) {
+        jQuery(`#temp_dislike_count${review_id}`).remove();
+        jQuery(`#temp_dislike_btn${review_id}`).remove();
         jQuery(`#empty_dislike${review_id}`).remove();
         jQuery(`#dislike_btn${review_id}`).append(uploadResponse);
-        console.log(uploadResponse);
 
         //URL to load total number of likes & dislikes from db
-        var queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
+        queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
 
         //POST data to query_likes.php so that review_id is accessible
         jQuery.post(queryUrl, data, function(response){
-            var responseList = JSON.parse(response);
-            var sumLikes = responseList.likes;
-            var sumDislikes = responseList.dislikes;
-            var rev_id = responseList.review_id;
+            responseList = JSON.parse(response);
+            sumLikes = responseList.likes;
+            sumDislikes = responseList.dislikes;
+            rev_id = responseList.review_id;
             jQuery(`#dislike_count${review_id}`).append(sumDislikes);
             jQuery(`#like_btn${review_id}`).append(`<div id='like_count' style='font-size: .5em; text-align: center;'>${sumLikes}</div>`)
-            console.log(responseList);
         });
     });
 
-    // remove icon if shit fails
 };
