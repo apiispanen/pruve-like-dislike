@@ -8,8 +8,9 @@ function query_likes() {
     
     $table_name = $wpdb->prefix . 'like_dislike_reviews';
     
-    $sql = "SELECT SUM(`liked`), SUM(`disliked`) FROM $table_name WHERE 1 AND `review_id` = $review_id";
+    $sql = $wpdb->prepare("SELECT SUM(`liked`), SUM(`disliked`) FROM $table_name WHERE 1 AND `review_id` = $review_id");
 
+    
     $sum_likes = $wpdb->get_var($sql, 0);
     $sum_dislikes = $wpdb->get_var($sql, 1);
     

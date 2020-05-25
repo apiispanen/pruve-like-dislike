@@ -1,32 +1,98 @@
 let reviews
 
+// .entry-content (SAM) --> .review-list (PRUVE)
+let reviews_class = document.querySelectorAll('.entry-content');
+
+let headers_class = document.querySelectorAll('.entry-title')
+
+// submissions = result of query, list of objects
+let submissionsOnPage = [];
+
 jQuery(document).ready(function() {
     console.log("like_dislike_reviews_script loaded");
 
-    reviews = document.querySelectorAll('.entry-content');
+    // .entry-content (SAM) --> .review-description (PRUVE)
+   
+    //query
+    let submissionURL = "/wp-content/plugins/like_dislike_reviews/query_submissions.php"
+    
+    // callback function within handleData -- adds buttons to the correct reviews
+    function addButtons(listToCheck) {
+        const item = listToCheck[0]
 
-    for (var review = 0; review < reviews.length; review++){
-        var btnHTML = jQuery(`<div class='btn_container' id='btn_container${review}'><div class='like_btn' id='like_btn${review}'><img id='empty_like${review}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${review}'><img id='empty_dislike${review}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_down.png'></div></div>`);
-        reviews[review].append(btnHTML[0]);
-        reviews[review].setAttribute('id', `entry_${review}`);
-        console.log(`added btns to review no. ${review}`);
+        for (let i = 0; i < reviews_class.length; i++){
+        
+            let review = reviews_class[i];
+            console.log(review)
 
-        //add event listeners to buttons
-        jQuery(`#btn_container${review}`).find('.like_btn').one('click', incrementLiked);
-        jQuery(`#btn_container${review}`).find('.dislike_btn').one('click', incrementDisliked);
-    }    
+            console.log(review.classList)
 
-    return reviews;
-}
-);
+            review.classList.add(`review-${i}`)
+    
+            // for testing -- title = citation
+            let reviewCitation = headers_class[i].textContent.trim();
+            // console.log(reviewCitation)
+
+            let btnHTML = jQuery(`<div class='btn_container' id='btn_container${i}'><div class='like_btn' id='like_btn${i}'><img id='empty_like${i}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${i}'><img id='empty_dislike${i}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_down.png'></div></div>`);
+
+            review.append(btnHTML[0])
+
+            //change ${review} to something else
+            //add event listeners to buttons
+            jQuery(`#btn_container${i}`).find('.like_btn').one('click', incrementLiked);
+            jQuery(`#btn_container${i}`).find('.dislike_btn').one('click', incrementDisliked);
+        }     
+    }
+
+    const handleData = function (data) {
+        
+        const submissionsObj = JSON.parse(data)
+        for (let submission = 0; submission < submissionsObj.length; submission++) {
+        // console.log(submissionsObj[submission])
+            
+        let newObj
+        let description = submissionsObj[submission]['description'];
+        let citation = submissionsObj[submission]['citations'];
+            
+        //if description == element description, if href of a tag == citation
+        if (description == 'this is the best treatment evur' && citation == 'Review'){
+                newObj = submissionsObj[submission]
+                submissionsOnPage.push(newObj)
+                console.log("FOUND IT")
+            } 
+
+            if (submissionsOnPage.length > 0) {
+                console.log(`XX ${submissionsOnPage}`)
+            }
+        }
+
+        addButtons(submissionsOnPage)
+           
+        }
+
+        
+
+    const submissions = function() {
+        return jQuery.ajax({
+            url: submissionURL
+        })
+        
+    }
+    
+    submissions().then(handleData)
+
+    })
+        
+    
 
 // user_id will come from Drew's SQL table
-const user_id = 4;
+const user_id = 5;
 // review_id MAY also come from Drew's SQL table
+
 
 function incrementLiked (e) {
     // get the ID tag of the review 
-    var review_id_tag = new String(jQuery(e.target).parent().prop("id"));
+    var review_id_tag = new String(jQuery(e.target).parent().prop("class"));
 
     // get the number of the review and add it to a new variable called review_id for use in POST
     var review_id = review_id_tag[review_id_tag.length - 1];
@@ -37,7 +103,7 @@ function incrementLiked (e) {
     var liked = 1;
     var disliked = 0;
 
-    //ensure that a user can't like and dislike the same review
+    //ensure that a user can only click like/dislike once for each review without refreshing
     jQuery( `#dislike_btn${review_id}` ).off( 'click', incrementDisliked);
     var uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
     var data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
@@ -85,12 +151,14 @@ function incrementDisliked (e) {
     var uploadUrl = '/wp-content/plugins/like_dislike_reviews/upload_likes.php';
     var data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
+    // add an icon to show that the user clicked
+
     jQuery.post(uploadUrl, data, function(uploadResponse) {
         jQuery(`#empty_dislike${review_id}`).remove();
         jQuery(`#dislike_btn${review_id}`).append(uploadResponse);
         console.log(uploadResponse);
 
-        //callback to load total number of likes & dislikes from db
+        //URL to load total number of likes & dislikes from db
         var queryUrl = '/wp-content/plugins/like_dislike_reviews/query_likes.php';
 
         //POST data to query_likes.php so that review_id is accessible
@@ -105,4 +173,5 @@ function incrementDisliked (e) {
         });
     });
 
+    // remove icon if shit fails
 };

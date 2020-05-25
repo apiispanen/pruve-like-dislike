@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: like_dislike_reviews
-Description: Display likes and dislikes for reviews
+Description: Adds a like and dislike button to reviews of treatments
 Version: 1.0.0
 Author: Sam Casey
 */
