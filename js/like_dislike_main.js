@@ -79,7 +79,7 @@ let reviewGrandChildren = reviewChildren.children()
     let data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
     // temporary HTML to add a button and a temporary number to screen before calling to server
-    let tempHTML = `<img id='temp_like_btn${review_id}' src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_up.png'> <div id='temp_like_count${review_id}' style='font-size: .5em; text-align: center;'>0</div>`
+    let tempHTML = `<img id='temp_like_btn${review_id}' src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_up.png'> <div id='temp_like_count${review_id}' style='font-size: 1em; text-align: center;'>0</div>`
 
     jQuery(`#empty_like${review_id}`).remove();
     jQuery(`#like_btn${review_id}`).append(tempHTML)
@@ -100,7 +100,7 @@ let reviewGrandChildren = reviewChildren.children()
             let sumDislikes = responseList.dislikes;
             let rev_id = responseList.review_id;
             jQuery(`#like_count${review_id}`).append(sumLikes);
-            jQuery(`#dislike_btn${review_id}`).append(`<div id='dislike_count' style='font-size: .5em; text-align: center;'>${sumDislikes}</div>`)
+            jQuery(`#dislike_btn${review_id}`).append(`<div id='dislike_count' style='font-size: 1em; text-align: center;'>${sumDislikes}</div>`)
         })
 
     })    
@@ -123,7 +123,7 @@ function incrementDisliked (e) {
     let data = {postliked:liked, postdisliked:disliked, userid: user_id, reviewid: review_id};
 
     // add an icon to show that the user clicked
-    let tempHTML = `<img id='temp_dislike_btn${review_id}' src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_down.png'> <div id='temp_dislike_count${review_id}' style='font-size: .5em; text-align: center;'>0</div>`
+    let tempHTML = `<img id='temp_dislike_btn${review_id}' src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_down.png'> <div id='temp_dislike_count${review_id}' style='font-size: 1em; text-align: center;'>0</div>`
 
     jQuery(`#empty_dislike${review_id}`).remove();
     jQuery(`#dislike_btn${review_id}`).append(tempHTML)
@@ -144,7 +144,7 @@ function incrementDisliked (e) {
             sumDislikes = responseList.dislikes;
             rev_id = responseList.review_id;
             jQuery(`#dislike_count${review_id}`).append(sumDislikes);
-            jQuery(`#like_btn${review_id}`).append(`<div id='like_count' style='font-size: .5em; text-align: center;'>${sumLikes}</div>`)
+            jQuery(`#like_btn${review_id}`).append(`<div id='like_count' style='font-size: 1em; text-align: center;'>${sumLikes}</div>`)
         });
     });
 

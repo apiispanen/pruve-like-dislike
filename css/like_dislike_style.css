@@ -2,16 +2,17 @@
     display: grid;
     grid-template-rows: 1fr;
     grid-template-columns: 20fr 1fr 1fr;
+    margin-top:-15px;
 }
 
 .like_btn {
-    width: 1em;
+    width: 2em;
     justify-self: right;
     grid-column: 2;
 }
 
 .dislike_btn {
-    width: 1em;
+    width: 2em;
     justify-self: right;
     grid-column: 3;
 }

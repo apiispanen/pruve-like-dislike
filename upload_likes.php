@@ -8,7 +8,7 @@ function upload_likes() {
 
     $liked = $_POST['postliked'];
     $disliked = $_POST['postdisliked'];
-    $user_id = $_POST['userid'];
+    $user_id = get_current_user_id();
     $review_id = $_POST['reviewid'];
 
     // get existing rows from database   
@@ -18,8 +18,8 @@ function upload_likes() {
 
     $new_row = array('user_id' => $user_id, 'review_id' => $review_id, 'liked' => $liked, 'disliked' => $disliked);
     
-    $like_data = array("<img src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_up.png'>", "<div id='like_count$review_id' style='font-size: .5em; text-align: center;'></div>");
-    $dislike_data = array("<img src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_down.png'>", "<div id='dislike_count$review_id' style='font-size: .5em; text-align: center;'></div>");
+    $like_data = array("<img src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_up.png'>", "<div id='like_count$review_id' style='font-size: 1em; text-align: center;'></div>");
+    $dislike_data = array("<img src='/wp-content/plugins/like_dislike_reviews/images/filled_thumb_down.png'>", "<div id='dislike_count$review_id' style='font-size: 1em; text-align: center;'></div>");
 
     if(count($rows) == 0 ) {
         $wpdb->insert($table_name, $new_row);
