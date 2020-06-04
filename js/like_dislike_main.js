@@ -7,27 +7,34 @@ const user_id = 6;
 // let submissionsOnPage = [];
 
 jQuery(document).ready(function() {
+    
+    //AJAX here to get user id
+    
     console.log("like_dislike_reviews_script loaded");
     
     // .entry-content (SAM) --> .review-list (PRUVE)
-    let reviewsClass = document.querySelectorAll('.entry-content');
+    let reviewsClass = document.querySelectorAll('.reviews');
     
     // callback function within handleData -- adds buttons to the correct reviews
+    
+    
     function addButtons() {
 
+        // change 2 to reviewsClass.length
         for (let i = 0; i < reviewsClass.length; i++){
-        
-            let review = reviewsClass[i];
-            console.log(review)
+            
+            let review = jQuery(reviewsClass[i]);
+            console.log
 
-            let btnHTML = jQuery(`<div class='btn_container' id='btn_container${i}'><div class='like_btn' id='like_btn${i}'><img id='empty_like${i}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${i}'><img id='empty_dislike${i}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_down.png'></div></div>`);
+            let rev_id = jQuery(review.children()[1]).prop("id")
 
-            review.append(btnHTML[0])
+            let btnHTML = jQuery(`<div class='btn_container' id='btn_container${rev_id}'><div class='like_btn' id='like_btn${rev_id}'><img id='empty_like${rev_id}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_up.png'></div><div class='dislike_btn' id='dislike_btn${rev_id}'><img id='empty_dislike${rev_id}' src='/wp-content/plugins/like_dislike_reviews/images/empty_thumb_down.png'></div></div>`);
+            
+            review.children()[1].append(btnHTML[0])
 
-            //change ${review} to something else
             //add event listeners to buttons
-            jQuery(`#btn_container${i}`).find('.like_btn').one('click', incrementLiked);
-            jQuery(`#btn_container${i}`).find('.dislike_btn').one('click', incrementDisliked);
+            jQuery(`#btn_container${rev_id}`).find('.like_btn').one('click', incrementLiked);
+            jQuery(`#btn_container${rev_id}`).find('.dislike_btn').one('click', incrementDisliked);
         }     
     }
     
@@ -40,48 +47,27 @@ function incrementLiked (e) {
 
 // uncomment below block comment to find review IDs from description class
 
-/*
-let reviews = document.querySelector('.review-list')
+
+let reviews = document.querySelector('.reviews')
+
+console.log(`liked: ${reviews}`)
 
 let review = jQuery(reviews.children[0])
-
-const btns = jQuery("<div>BOOTONS</div>")
+console.log(`review: ${review}`)
 
 let reviewChildren = review.children()
 
-reviewChildren[1].append(btns[0])
+
 
 let reviewGrandChildren = reviewChildren.children()
 
-for (let el of reviewGrandChildren) {
-    console.log(el.classList);
-    if (el.classList.contains('review-description')) {
-        
-        let reviewIdClass = el.classList[1]
-        let reviewId 
-        let dashIndex
-        
-        for (let char of reviewIdClass) {
-            if (char == "-") {
-                console.log('FOUND THE DASH')
-                console.log(reviewIdClass.indexOf(char))
-                dashIndex = reviewIdClass.indexOf(char)
-                break
-            }
-        }
-        
-        reviewId = reviewIdClass.slice(dashIndex + 1, reviewIdClass.length)
-        console.log(reviewId)
-        break;
-    }
-}
-*/
 
     // delete this after uncommenting above commented block
-    let review_id_tag = new String(jQuery(e.target).parent().prop("id"));
+    let review_id = jQuery(e.target).parent().parent().parent().prop("id");
+    console.log(`review_idinLIKE: ${review_id}`)
+
 
     // uncomment large block above and assign review_id to reviewId
-    let review_id = review_id_tag[review_id_tag.length - 1];
 
     // 1 == TRUE, 0 == FALSE
     let liked = 1;
@@ -122,44 +108,7 @@ for (let el of reviewGrandChildren) {
 
 function incrementDisliked (e) {
 
-// uncomment below block comment to find review IDs from description class
-
-    /*
-
-    let review = jQuery(btns.parent())
-
-    let reviewChildren = review.children()
-
-    for (let el of reviewChildren) {
-        console.log(el)
-        // console.log(el.classList);
-        if (el.classList.contains('review-description')) {
-            
-            let reviewIdClass = el.classList[1]
-            let reviewId 
-            let dashIndex
-            
-            for (let char of reviewIdClass) {
-                if (char == "-") {
-                    console.log('FOUND THE DASH')
-                    console.log(reviewIdClass.indexOf(char))
-                    dashIndex = reviewIdClass.indexOf(char)
-                    break
-                }
-            }
-            
-            reviewId = reviewIdClass.slice(dashIndex + 1, reviewIdClass.length)
-            console.log(reviewId)
-            break;
-    }
-}
-*/
-
-    // delete this line after uncommenting above commented block
-    let review_id_tag = new String(jQuery(e.target).parent().prop("id"));
-
-    // uncomment large block above and assign review_id to reviewId
-    let review_id = review_id_tag[review_id_tag.length - 1];
+    let review_id = jQuery(e.target).parent().parent().parent().prop("id");
 
     // 1 == TRUE, 0 == FALSE
     let liked = 0;

@@ -39,6 +39,4 @@ function upload_likes() {
 }
 
 upload_likes();
-
 ?>
-
